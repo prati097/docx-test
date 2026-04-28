@@ -1,12 +1,54 @@
-Hello Pratima
+{benchName}
 
-Testing docx diff feature
+{jurisdiction}
 
-Added one more line
-this is a new line
-THIS IS A CHANGE FOR PR TEST
-THIS IS SECOND CHANGE FOR TEST
-FINAL TEST LINE FOR FULL VIEW polo
-I am testing this again for the actual line changes
-hello Pratima
-this is for testing on repo
+{applicationType} NO. {applicationNum} OF {applicationYear}
+
+IN
+
+{caseType} NO. {petitionNumber} OF {yearOfPetition}
+
+IN THE MATTER OF:
+
++-----------------------------------+----------------------------------:+
+| {petitionerWS}                    | …{filingPartyN}                   |
++-----------------------------------+-----------------------------------+
+| VERSUS                                                                |
++-----------------------------------+-----------------------------------+
+| {respondentWS}                    | …{oppositePartyN}                 |
++-----------------------------------+-----------------------------------+
+|                                   |                                   |
++-----------------------------------+-----------------------------------+
+|                                   |                                   |
++-----------------------------------+-----------------------------------+
+
+I, {nameOfSignatory} {nameOfParentOfSignatory}, aged about
+{ageOfSignatory}, being the {designationOfSignatory}, having
+{signatoryLocation} at {addressOfSignatory}, do hereby solemnly state
+and affirm on oath as under:
+
+1) That I am the {DESIGNATION OF THE SIGNATORY} in the captioned
+{docType} and as such I am conversant with the facts and circumstances
+of the present case and competent to swear the present affidavit.
+
+2) That the accompanying {docType} has been drafted by my counsel under
+my instructions and contents of the same are not being repeated herein
+for the sake of brevity. The contents of the same are true and correct
+to the best of my knowledge and belief.
+
+3) Nothing false is contained therein and nothing material has been
+concealed therefrom.
+
+4) The documents annexed with this {docType} are true copies of the
+original.
+
+DEPONENT
+
+VERIFICATION
+
+Verified on this {dayOfFiling} day of {monthOfFiling}, {yearOfFiling} at
+{placeOfFiling} that the contents of this affidavit are true and correct
+to the best of my knowledge and nothing material has been concealed
+therefrom.
+
+DEPONENT
