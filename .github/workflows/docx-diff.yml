@@ -16,20 +16,24 @@ jobs:
       - name: Install Pandoc
         run: sudo apt-get update && sudo apt-get install -y pandoc
 
-      - name: Find changed DOCX files
-        run: |
-          git diff --name-only origin/${{ github.base_ref }}...HEAD > files.txt
-          grep '\.docx$' files.txt > docx_files.txt || true
-
-      - name: Generate Diff
+      - name: Generate DOCX diff
         run: |
           echo "# DOCX Diff Report" > diff.md
-          while read file; do
-            echo "## File: $file" >> diff.md
-            git show origin/${{ github.base_ref }}:$file | pandoc -t plain > old.txt || true
-            pandoc "$file" -t plain > new.txt
-            diff -u old.txt new.txt >> diff.md || true
-          done < docx_files.txt
+
+          FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep '\.docx$' || true)
+
+          if [ -z "$FILES" ]; then
+            echo "No DOCX changes found." >> diff.md
+          else
+            for file in $FILES; do
+              echo "## File: $file" >> diff.md
+
+              git show origin/${{ github.base_ref }}:$file | pandoc -t plain > old.txt || echo "" > old.txt
+              pandoc "$file" -t plain > new.txt
+
+              diff -u old.txt new.txt >> diff.md || true
+            done
+          fi
 
       - name: Comment PR
         uses: marocchino/sticky-pull-request-comment@v2
