@@ -12,13 +12,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - run: sudo apt-get update && sudo apt-get install -y pandoc
+      - name: Install Pandoc
+        run: sudo apt-get update && sudo apt-get install -y pandoc
 
-      - name: Generate diff
+      - name: Generate DOCX full diff
         run: |
           echo "# DOCX Diff Report" > diff.md
 
@@ -29,12 +31,32 @@ jobs:
           if [ -z "$FILE" ]; then
             echo "No DOCX changes found." >> diff.md
           else
-            echo "## $FILE" >> diff.md
+            echo "## File: $FILE" >> diff.md
 
+            # Convert old and new versions to text
             git show origin/main:$FILE | pandoc -t plain > old.txt || echo "" > old.txt
             pandoc "$FILE" -t plain > new.txt
 
-            diff -u old.txt new.txt >> diff.md || true
+            # OLD VERSION
+            echo "" >> diff.md
+            echo "### OLD VERSION" >> diff.md
+            echo '```' >> diff.md
+            cat old.txt >> diff.md
+            echo '```' >> diff.md
+
+            # NEW VERSION
+            echo "" >> diff.md
+            echo "### NEW VERSION" >> diff.md
+            echo '```' >> diff.md
+            cat new.txt >> diff.md
+            echo '```' >> diff.md
+
+            # DIFF
+            echo "" >> diff.md
+            echo "### CHANGES" >> diff.md
+            echo '```diff' >> diff.md
+            diff -u --text old.txt new.txt >> diff.md || true
+            echo '```' >> diff.md
           fi
 
       - name: Comment PR
