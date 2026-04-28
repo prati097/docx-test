@@ -3,6 +3,10 @@ name: DOCX Diff Viewer
 on:
   pull_request:
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   docx-diff:
     runs-on: ubuntu-latest
