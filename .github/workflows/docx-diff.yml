@@ -8,31 +8,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install Pandoc
-        run: sudo apt-get update && sudo apt-get install -y pandoc
+      - run: sudo apt-get update && sudo apt-get install -y pandoc
 
-      - name: Generate DOCX diff
+      - name: Generate diff
         run: |
           echo "# DOCX Diff Report" > diff.md
 
-          FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep '\.docx$' || true)
+          git fetch origin main
 
-          if [ -z "$FILES" ]; then
+          FILE=$(git diff --name-only origin/main HEAD | grep '\.docx$' | head -n 1)
+
+          if [ -z "$FILE" ]; then
             echo "No DOCX changes found." >> diff.md
           else
-            for file in $FILES; do
-              echo "## File: $file" >> diff.md
+            echo "## $FILE" >> diff.md
 
-              git show origin/${{ github.base_ref }}:$file | pandoc -t plain > old.txt || echo "" > old.txt
-              pandoc "$file" -t plain > new.txt
+            git show origin/main:$FILE | pandoc -t plain > old.txt || echo "" > old.txt
+            pandoc "$FILE" -t plain > new.txt
 
-              diff -u old.txt new.txt >> diff.md || true
-            done
+            diff -u old.txt new.txt >> diff.md || true
           fi
 
       - name: Comment PR
