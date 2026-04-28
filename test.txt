@@ -1,7 +1,5 @@
 Hello Pratima
 
-This is version 9
-
 Testing docx diff feature
 
 Added one more line
