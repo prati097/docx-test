@@ -3,6 +3,10 @@ name: DOCX Diff Viewer
 on:
   pull_request:
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   docx-diff:
     runs-on: ubuntu-latest
@@ -16,20 +20,44 @@ jobs:
       - name: Install Pandoc
         run: sudo apt-get update && sudo apt-get install -y pandoc
 
-      - name: Find changed DOCX files
-        run: |
-          git diff --name-only origin/${{ github.base_ref }}...HEAD > files.txt
-          grep '\.docx$' files.txt > docx_files.txt || true
-
-      - name: Generate Diff
+      - name: Generate DOCX full diff
         run: |
           echo "# DOCX Diff Report" > diff.md
-          while read file; do
-            echo "## File: $file" >> diff.md
-            git show origin/${{ github.base_ref }}:$file | pandoc -t plain > old.txt || true
-            pandoc "$file" -t plain > new.txt
-            diff -u old.txt new.txt >> diff.md || true
-          done < docx_files.txt
+
+          git fetch origin main
+
+          FILE=$(git diff --name-only origin/main HEAD | grep '\.docx$' | head -n 1)
+
+          if [ -z "$FILE" ]; then
+            echo "No DOCX changes found." >> diff.md
+          else
+            echo "## File: $FILE" >> diff.md
+
+            # Convert old and new versions to text
+            git show origin/main:$FILE | pandoc -t plain > old.txt || echo "" > old.txt
+            pandoc "$FILE" -t plain > new.txt
+
+            # OLD VERSION
+            echo "" >> diff.md
+            echo "### OLD VERSION" >> diff.md
+            echo '```' >> diff.md
+            cat old.txt >> diff.md
+            echo '```' >> diff.md
+
+            # NEW VERSION
+            echo "" >> diff.md
+            echo "### NEW VERSION" >> diff.md
+            echo '```' >> diff.md
+            cat new.txt >> diff.md
+            echo '```' >> diff.md
+
+            # DIFF
+            echo "" >> diff.md
+            echo "### CHANGES" >> diff.md
+            echo '```diff' >> diff.md
+            diff -u --text old.txt new.txt >> diff.md || true
+            echo '```' >> diff.md
+          fi
 
       - name: Comment PR
         uses: marocchino/sticky-pull-request-comment@v2
